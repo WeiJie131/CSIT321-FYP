@@ -2,29 +2,32 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const db = require("./config/db");
+const supabase = require("./config/supabase");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// Test MySQL connection
-db.getConnection((err, connection) => {
-    if (err) {
-        console.error("Database connection failed:", err.message);
-        return;
+// Test Supabase connection
+app.get("/", async (req, res) => {
+    const { data, error } = await supabase
+        .from("users")
+        .select("user_id")
+        .limit(1);
+
+    if (error) {
+        console.error("Supabase connection failed:", error.message);
+
+        return res.status(500).json({
+            message: "Supabase connection failed",
+            error: error.message
+        });
     }
 
-    console.log("Connected to GardenLens MySQL database!");
-
-    connection.release();
-});
-
-// Test API endpoint
-app.get("/", (req, res) => {
     res.json({
-        message: "Welcome to GardenLens API!"
+        message: "Welcome to GardenLens API!",
+        database: "Supabase connected successfully"
     });
 });
 
