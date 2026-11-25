@@ -208,3 +208,25 @@
 .camera-button:hover {
   background-color: #46783a;
 }
+
+.sidebar-welcome {
+    padding: 12px 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #143d2c;
+}
+
+.sidebar-logout {
+    background: none;
+    border: none;
+    padding: 15px 10px;
+    text-align: left;
+    font-size: 16px;
+    color: #a33434;
+    cursor: pointer;
+}
+
+.sidebar-logout:hover {
+    background-color: #f0dfd9;
+    border-radius: 6px;
+}

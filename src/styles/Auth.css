@@ -1,0 +1,386 @@
+
+/* Shared authentication page */
+
+.auth-page {
+    min-height: 100dvh;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: #f4f3e4;
+    color: #143d2c;
+}
+
+.auth-content {
+    padding: 25px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Login branding */
+
+.login-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.login-logo {
+    width: 230px;
+    height: 120px;
+    object-fit: contain;
+}
+
+.login-brand p {
+    font-family: Georgia, serif;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.login-banner {
+    display: block;
+    width: 100%;
+    height: 235px;
+    object-fit: cover;
+}
+
+.login-title {
+    font-family: Georgia, serif;
+    font-size: 25px;
+    font-weight: normal;
+    margin-bottom: 22px;
+}
+
+/* Registration header */
+
+.register-header {
+    min-height: 175px;
+    display: flex;
+    align-items: flex-end;
+    padding: 25px;
+
+    background: linear-gradient(
+        135deg,
+        #e2e9d8,
+        #cbd9bc
+    );
+}
+
+.register-header h1 {
+    font-family: Georgia, serif;
+    font-weight: normal;
+    font-size: 32px;
+}
+
+.auth-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    text-decoration: none;
+    color: #143d2c;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+/* Form fields */
+
+.auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.auth-field label,
+.auth-radio-field legend {
+    color: #71884e;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.auth-field input,
+.auth-field select,
+.auth-field textarea {
+    width: 100%;
+    min-height: 43px;
+    padding: 10px 12px;
+    background-color: #fafafa;
+    border: 1px solid #d6d9d0;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #263d28;
+    outline: none;
+}
+
+.auth-field input:focus,
+.auth-field select:focus,
+.auth-field textarea:focus {
+    border-color: #819557;
+    box-shadow: 0 0 0 2px #81955720;
+}
+
+.auth-field textarea {
+    resize: vertical;
+    min-height: 130px;
+    font-family: inherit;
+}
+
+/* Password visibility */
+
+.password-field {
+    position: relative;
+}
+
+.password-field input {
+    padding-right: 45px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #71884e;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+/* Personal particulars */
+
+.auth-divider {
+    border: none;
+    border-top: 1px solid #dce2d4;
+    margin: 5px 0;
+}
+
+.auth-section-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: #143d2c;
+}
+
+.auth-radio-field {
+    border: none;
+    padding: 0;
+}
+
+.auth-radio-field legend {
+    margin-bottom: 12px;
+}
+
+.radio-options {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.radio-options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #315c27;
+    cursor: pointer;
+}
+
+.radio-options input {
+    accent-color: #819557;
+    width: 17px;
+    height: 17px;
+}
+
+/* Plant enthusiast credentials */
+
+.enthusiast-section {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-top: 20px;
+    border-top: 1px solid #dce2d4;
+}
+
+.credential-upload {
+    position: relative;
+    min-height: 160px;
+    padding: 25px 15px;
+    background-color: #e3e5e1;
+    border: 1px dashed #a4b197;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    color: #315c27;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+}
+
+.credential-upload input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.credential-upload:focus-within {
+    outline: 2px solid #819557;
+}
+
+.credential-upload small {
+    color: #71884e;
+    font-size: 12px;
+}
+
+.remove-file {
+    align-self: center;
+    background: none;
+    border: none;
+    color: #a33434;
+    text-decoration: underline;
+    font-size: 13px;
+}
+
+.approval-notice {
+    background-color: #e7ebdc;
+    border-radius: 5px;
+    padding: 12px;
+    color: #52633d;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* Submit button */
+
+.auth-submit {
+    width: 100%;
+    min-height: 44px;
+    border: none;
+    border-radius: 5px;
+    padding: 12px;
+    background-color: #819557;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.auth-submit:hover {
+    background-color: #6d8148;
+}
+
+.auth-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Login links */
+
+.create-account-link {
+    align-self: flex-end;
+    color: #71884e;
+    font-size: 13px;
+}
+
+.skip-link {
+    display: block;
+    text-align: center;
+    color: #71884e;
+    font-size: 13px;
+    margin-top: 35px;
+}
+
+/* Error and success messages */
+
+.auth-error {
+    padding: 12px;
+    border-radius: 5px;
+    background-color: #f8e2e2;
+    color: #a33434;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.auth-success {
+    padding: 12px;
+    border-radius: 5px;
+    background-color: #e0ead7;
+    color: #315c27;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.auth-success a {
+    display: inline-block;
+    margin-top: 10px;
+    color: #315c27;
+}
+
+/* Application submitted page */
+
+.application-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+.application-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 18px;
+}
+
+.application-icon {
+    color: #819557;
+}
+
+.application-content h1 {
+    font-family: Georgia, serif;
+    font-size: 30px;
+    font-weight: normal;
+    color: #143d2c;
+}
+
+.application-content p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #71884e;
+}
+
+.application-button {
+    margin-top: 35px;
+}
+
+/* Small mobile screens */
+
+@media (max-width: 380px) {
+
+    .auth-content {
+        padding: 20px;
+    }
+
+    .login-banner {
+        height: 190px;
+    }
+
+    .register-header {
+        min-height: 145px;
+    }
+}

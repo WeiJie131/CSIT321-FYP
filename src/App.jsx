@@ -1,74 +1,149 @@
+
 import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Link,
+    BrowserRouter,
+    Routes,
+    Route,
+    Link,
+    Navigate
 } from "react-router-dom";
+
+import {
+    AuthProvider,
+    useAuth
+} from "./context/AuthContext";
 
 import Home from "./pages/Home";
 import Camera from "./pages/Camera";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ApplicationSubmitted from "./pages/ApplicationSubmitted";
 
 function ComingSoon({ title }) {
-  return (
-    <main style={{ padding: "30px", textAlign: "center" }}>
-      <h1>{title}</h1>
 
-      <p style={{ margin: "20px 0" }}>
-        This feature is coming soon.
-      </p>
+    return (
+        <main style={{
+            padding: "30px",
+            textAlign: "center"
+        }}>
 
-      <Link to="/">Back to Homepage</Link>
-    </main>
-  );
+            <h1>{title}</h1>
+
+            <p style={{ margin: "20px 0" }}>
+                This feature is coming soon.
+            </p>
+
+            <Link to="/">Back to Homepage</Link>
+
+        </main>
+    );
+}
+
+function ProtectedRoute({ children }) {
+
+    const { user, profile, loading } = useAuth();
+
+    if (loading || (user && !profile)) {
+        return <p>Loading...</p>;
+    }
+
+    if (!user || profile?.account_status !== "active") {
+        return <Navigate to="/login" replace />;
+    }
+
+    return children;
 }
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
 
-        <Route path="/" element={<Home />} />
+    return (
+        <BrowserRouter>
 
-        <Route path="/camera" element={<Camera />} />
+            <AuthProvider>
 
-        <Route
-          path="/login"
-          element={<ComingSoon title="Login" />}
-        />
+                <Routes>
 
-        <Route
-          path="/register"
-          element={<ComingSoon title="Registration" />}
-        />
+                    {/* Public pages */}
 
-        <Route
-          path="/favourites"
-          element={<ComingSoon title="Favourites" />}
-        />
+                    <Route path="/" element={<Home />} />
 
-        <Route
-          path="/history"
-          element={<ComingSoon title="Recognition History" />}
-        />
+                    <Route
+                        path="/camera"
+                        element={<Camera />}
+                    />
 
-        <Route
-          path="/trails"
-          element={<ComingSoon title="Trail Games" />}
-        />
+                    <Route
+                        path="/login"
+                        element={<Login />}
+                    />
 
-        <Route
-          path="/account"
-          element={<ComingSoon title="Account Details" />}
-        />
+                    <Route
+                        path="/register"
+                        element={<Register />}
+                    />
 
-        <Route
-          path="/feedback"
-          element={<ComingSoon title="Feedback Form" />}
-        />
+                    <Route
+                        path="/application-submitted"
+                        element={<ApplicationSubmitted />}
+                    />
 
-      </Routes>
-    </BrowserRouter>
-  );
+                    <Route
+                        path="/feedback"
+                        element={
+                            <ComingSoon title="Feedback Form" />
+                        }
+                    />
+
+                    <Route
+                        path="/trails"
+                        element={
+                            <ComingSoon title="Trail Games" />
+                        }
+                    />
+
+                    {/* Login required pages */}
+
+                    <Route
+                        path="/favourites"
+                        element={
+                            <ProtectedRoute>
+                                <ComingSoon title="Favourites" />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/history"
+                        element={
+                            <ProtectedRoute>
+                                <ComingSoon
+                                    title="Recognition History"
+                                />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/account"
+                        element={
+                            <ProtectedRoute>
+                                <ComingSoon
+                                    title="Account Details"
+                                />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="*"
+                        element={<Navigate to="/" replace />}
+                    />
+
+                </Routes>
+
+            </AuthProvider>
+
+        </BrowserRouter>
+    );
 }
 
 export default App;
