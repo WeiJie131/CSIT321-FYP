@@ -1,0 +1,237 @@
+
+/* Main camera page */
+
+.camera-page {
+  width: 100%;
+  height: 100dvh;
+  background-color: #0d2408;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: white;
+}
+
+/* Top navigation bar */
+
+.camera-header {
+  height: 65px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  background-color: #0d2408;
+}
+
+.camera-back-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: white;
+  padding: 8px;
+  cursor: pointer;
+}
+
+/* Camera preview */
+
+.camera-preview {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  background-color: #000000;
+  overflow: hidden;
+}
+
+.camera-video,
+.captured-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Camera focus frame */
+
+.focus-frame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 88%;
+  height: 65%;
+  max-width: 500px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.focus-frame span {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  border-color: rgba(255, 255, 255, 0.85);
+  border-style: solid;
+  border-width: 0;
+}
+
+.focus-top-left {
+  top: 0;
+  left: 0;
+  border-top-width: 2px !important;
+  border-left-width: 2px !important;
+}
+
+.focus-top-right {
+  top: 0;
+  right: 0;
+  border-top-width: 2px !important;
+  border-right-width: 2px !important;
+}
+
+.focus-bottom-left {
+  bottom: 0;
+  left: 0;
+  border-bottom-width: 2px !important;
+  border-left-width: 2px !important;
+}
+
+.focus-bottom-right {
+  bottom: 0;
+  right: 0;
+  border-bottom-width: 2px !important;
+  border-right-width: 2px !important;
+}
+
+/* Bottom camera controls */
+
+.camera-controls {
+  min-height: 95px;
+  flex-shrink: 0;
+  padding: 12px 20px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  background-color: #0d2408;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+}
+
+/* Shutter button */
+
+.shutter-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.shutter-button {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  border: 3px solid #dedede;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.shutter-inner {
+  display: block;
+  width: 51px;
+  height: 51px;
+  border-radius: 50%;
+  background-color: #dedede;
+}
+
+.shutter-button:active {
+  transform: scale(0.9);
+}
+
+.shutter-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.retake-label {
+  color: white;
+  font-size: 11px;
+}
+
+/* Upload gallery button */
+
+.gallery-button {
+  justify-self: end;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: white;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.gallery-button span {
+  font-size: 11px;
+}
+
+/* Camera loading */
+
+.camera-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 15px;
+}
+
+/* Camera error */
+
+.camera-error {
+  position: absolute;
+  inset: 0;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  text-align: center;
+  background-color: #142014;
+}
+
+.camera-error h2 {
+  font-size: 22px;
+}
+
+.camera-error p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #dedede;
+}
+
+.camera-retry-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: #315c27;
+  color: white;
+  cursor: pointer;
+}
+
+/* Desktop preview */
+
+@media (min-width: 768px) {
+  .camera-page {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
