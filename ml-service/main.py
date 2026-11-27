@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -14,17 +15,37 @@ from threading import Lock
 # 1. Create FastAPI application
 app = FastAPI(title="Garden Lens Recognition API")
 
-# 2. Allow React frontend to communicate with FastAPI
-# 2. Allow React frontend to communicate with FastAPI
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
+# 2. Configure CORS for development and production
+IS_DEVELOPMENT = os.getenv(
+    "APP_ENV", "development"
+) == "development"
+
+allowed_origins = [
+    "https://gardenlens.netlify.app"
+]
+
+if IS_DEVELOPMENT:
+    allowed_origins.extend([
         "http://localhost:5173",
         "http://localhost:3000",
-        "http://127.0.0.1:5173",
-        "http://192.168.1.6:5173",
-        "https://gardenlens.netlify.app"
-    ],
+        "http://127.0.0.1:5173"
+    ])
+
+# Allow private Wi-Fi network addresses during development
+local_origin_regex = (
+    r"^http://"
+    r"(192\.168\.\d{1,3}\.\d{1,3}"
+    r"|10\.\d{1,3}\.\d{1,3}\.\d{1,3}"
+    r"|172\.(1[6-9]|2[0-9]|3[01])\.\d{1,3}\.\d{1,3})"
+    r":5173$"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_origin_regex=(
+        local_origin_regex if IS_DEVELOPMENT else None
+    ),
     allow_methods=["GET", "POST"],
     allow_headers=["*"]
 )

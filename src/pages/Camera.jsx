@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ImagePlus, Camera as CameraIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ML_API_URL } from "../config/api";
 
 import "../styles/Camera.css";
 
@@ -205,9 +206,14 @@ function Camera() {
 
       formData.append("file", imageBlob, "photo.jpg");
 
+      // Check ML service configuration
+      if (!ML_API_URL) {
+        throw new Error("ML service URL is not configured.");
+      }
+
       // Send image to the ML service
       const response = await fetch(
-        `http://${window.location.hostname}:8000/predict`,
+        `${ML_API_URL}/predict`,
         {
           method: "POST",
           body: formData,
@@ -238,8 +244,8 @@ function Camera() {
   const bestPrediction =
     predictions.length > 0
       ? predictions.reduce((best, current) =>
-          current.confidence > best.confidence ? current : best,
-        )
+        current.confidence > best.confidence ? current : best,
+      )
       : null;
   const displayNames = {
     "Z1.1_Tanglin_Gate": "Tanglin Gate",
@@ -325,53 +331,53 @@ function Camera() {
         )}
 
         {/* Camera focus frame */}
-        
+
 
         <canvas ref={canvasRef} hidden />
       </main>
       {capturedImage && !bestPrediction && (
-  <button
-    className="recognise-button"
-    onClick={recogniseImage}
-    disabled={isRecognising}
-  >
-    {isRecognising
-      ? "Recognising..."
-      : "Recognise Image"}
-  </button>
-)}
+        <button
+          className="recognise-button"
+          onClick={recogniseImage}
+          disabled={isRecognising}
+        >
+          {isRecognising
+            ? "Recognising..."
+            : "Recognise Image"}
+        </button>
+      )}
       {recognitionError && <p>{recognitionError}</p>}
 
       {bestPrediction && (
-  <div className="recognition-result-card">
-    <p className="result-label">Recognised Image</p>
+        <div className="recognition-result-card">
+          <p className="result-label">Recognised Image</p>
 
-    <h2 className="result-name">
-      {displayNames[bestPrediction.class_name] ||
-        bestPrediction.class_name}
-    </h2>
+          <h2 className="result-name">
+            {displayNames[bestPrediction.class_name] ||
+              bestPrediction.class_name}
+          </h2>
 
-    <div className="match-score-row">
-      <span>Match score</span>
-      <strong>
-        {(bestPrediction.confidence * 100).toFixed(1)}%
-      </strong>
-    </div>
+          <div className="match-score-row">
+            <span>Match score</span>
+            <strong>
+              {(bestPrediction.confidence * 100).toFixed(1)}%
+            </strong>
+          </div>
 
-    <div className="match-progress">
-      <div
-        className="match-progress-fill"
-        style={{
-          width: `${bestPrediction.confidence * 100}%`
-        }}
-      />
-    </div>
+          <div className="match-progress">
+            <div
+              className="match-progress-fill"
+              style={{
+                width: `${bestPrediction.confidence * 100}%`
+              }}
+            />
+          </div>
 
-    <p className="result-note">
-      AI-suggested identification
-    </p>
-  </div>
-)}
+          <p className="result-note">
+            AI-suggested identification
+          </p>
+        </div>
+      )}
       {/* Bottom camera controls */}
       <footer className="camera-controls">
         <div className="camera-control-placeholder" />
