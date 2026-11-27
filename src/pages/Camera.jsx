@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ImagePlus, Camera as CameraIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +17,10 @@ function Camera() {
   const [cameraReady, setCameraReady] = useState(false);
   const [cameraAttempt, setCameraAttempt] = useState(0);
 
+  const [predictions, setPredictions] = useState([]);
+  const [isRecognising, setIsRecognising] = useState(false);
+  const [recognitionError, setRecognitionError] = useState("");
+
   // Start the camera when entering the page
   useEffect(() => {
     if (capturedImage) return;
@@ -30,26 +33,23 @@ function Camera() {
 
       try {
         if (!navigator.mediaDevices?.getUserMedia) {
-          throw new Error(
-            "Camera access requires a secure HTTPS connection."
-          );
+          throw new Error("Camera access requires a secure HTTPS connection.");
         }
 
-        const stream =
-          await navigator.mediaDevices.getUserMedia({
-            video: {
-              facingMode: {
-                ideal: "environment",
-              },
-              width: {
-                ideal: 1920,
-              },
-              height: {
-                ideal: 1080,
-              },
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: {
+              ideal: "environment",
             },
-            audio: false,
-          });
+            width: {
+              ideal: 1920,
+            },
+            height: {
+              ideal: 1080,
+            },
+          },
+          audio: false,
+        });
 
         if (cancelled) {
           stream.getTracks().forEach((track) => track.stop());
@@ -75,14 +75,12 @@ function Camera() {
 
         if (error.name === "NotAllowedError") {
           setCameraError(
-            "Camera permission denied. Please allow camera access."
+            "Camera permission denied. Please allow camera access.",
           );
         } else if (error.name === "NotFoundError") {
           setCameraError("No camera was detected.");
         } else {
-          setCameraError(
-            error.message || "Unable to access the camera."
-          );
+          setCameraError(error.message || "Unable to access the camera.");
         }
       }
     }
@@ -100,9 +98,7 @@ function Camera() {
   // Stop all active camera tracks
   function stopCamera() {
     if (streamRef.current) {
-      streamRef.current
-        .getTracks()
-        .forEach((track) => track.stop());
+      streamRef.current.getTracks().forEach((track) => track.stop());
 
       streamRef.current = null;
     }
@@ -130,13 +126,7 @@ function Camera() {
 
     if (!context) return;
 
-    context.drawImage(
-      video,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     const imageData = canvas.toDataURL("image/jpeg", 0.9);
 
@@ -151,8 +141,11 @@ function Camera() {
     setCameraReady(false);
     setCapturedImage(null);
     setCameraError("");
-  }
 
+    // Clear previous recognition results
+    setPredictions([]);
+    setRecognitionError("");
+  }
   // Open the phone gallery
   function openGallery() {
     fileInputRef.current?.click();
@@ -179,6 +172,8 @@ function Camera() {
       setCapturedImage(reader.result);
       setCameraReady(false);
       setCameraError("");
+      setPredictions([]);
+      setRecognitionError("");
     };
 
     reader.onerror = () => {
@@ -193,10 +188,70 @@ function Camera() {
     stopCamera();
     navigate("/");
   }
+  async function recogniseImage() {
+    if (!capturedImage) return;
 
+    setIsRecognising(true);
+    setRecognitionError("");
+    setPredictions([]);
+
+    try {
+      // Convert the captured image into a Blob
+      const imageResponse = await fetch(capturedImage);
+      const imageBlob = await imageResponse.blob();
+
+      // Prepare the image for FastAPI
+      const formData = new FormData();
+
+      formData.append("file", imageBlob, "photo.jpg");
+
+      // Send image to the ML service
+      const response = await fetch(
+        `http://${window.location.hostname}:8000/predict`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+      if (!response.ok) {
+        throw new Error("Image recognition failed.");
+      }
+
+      const result = await response.json();
+
+      console.log(result);
+
+      if (result.status === "blurry") {
+        setRecognitionError("Photo is blurry. Please retake it.");
+      } else if (result.status === "not_sure") {
+        setRecognitionError("Unable to confidently identify this object.");
+      } else {
+        setPredictions(result.top3);
+      }
+    } catch (error) {
+      setRecognitionError(error.message);
+    } finally {
+      setIsRecognising(false);
+    }
+  }
+  // Select the highest confidence prediction
+  const bestPrediction =
+    predictions.length > 0
+      ? predictions.reduce((best, current) =>
+          current.confidence > best.confidence ? current : best,
+        )
+      : null;
+  const displayNames = {
+    "Z1.1_Tanglin_Gate": "Tanglin Gate",
+    "Z1.2_Tembusu_Tree": "Tembusu Tree",
+    "Z1.3_Holttum_Hall": "Holttum Hall",
+    "Z1.4_Frangipani": "Frangipani",
+    "Z1.5_Couroupita_Guianensis": "Cannonball Tree",
+    "Z1.6_Vanda_Miss_Joaquim": "Vanda Miss Joaquim",
+    Others: "Unrecognised Object",
+  };
   return (
     <div className="camera-page">
-
       {/* Top navigation bar */}
       <header className="camera-header">
         <button
@@ -211,7 +266,6 @@ function Camera() {
 
       {/* Camera preview */}
       <main className="camera-preview">
-
         {capturedImage ? (
           <img
             src={capturedImage}
@@ -219,13 +273,29 @@ function Camera() {
             className="captured-image"
           />
         ) : (
-          <video
-            ref={videoRef}
-            className="camera-video"
-            autoPlay
-            playsInline
-            muted
-          />
+          <div className="camera-preview-container">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="camera-live-video"
+            />
+
+            {/* Camera guidance overlay */}
+            <div className="camera-guide-overlay">
+              <div className="camera-guide-frame">
+                <span className="guide-corner top-left"></span>
+                <span className="guide-corner top-right"></span>
+                <span className="guide-corner bottom-left"></span>
+                <span className="guide-corner bottom-right"></span>
+              </div>
+
+              <p className="camera-guide-text">
+                Position the plant or landmark inside the frame
+              </p>
+            </div>
+          </div>
         )}
 
         {/* Camera error message */}
@@ -240,9 +310,7 @@ function Camera() {
             <button
               type="button"
               className="camera-retry-button"
-              onClick={() =>
-                setCameraAttempt((attempt) => attempt + 1)
-              }
+              onClick={() => setCameraAttempt((attempt) => attempt + 1)}
             >
               Try Again
             </button>
@@ -253,28 +321,59 @@ function Camera() {
 
         {/* Camera loading message */}
         {!capturedImage && !cameraReady && !cameraError && (
-          <div className="camera-loading">
-            Opening camera...
-          </div>
+          <div className="camera-loading">Opening camera...</div>
         )}
 
         {/* Camera focus frame */}
-        {!capturedImage && cameraReady && (
-          <div className="focus-frame">
-            <span className="focus-top-left" />
-            <span className="focus-top-right" />
-            <span className="focus-bottom-left" />
-            <span className="focus-bottom-right" />
-          </div>
-        )}
+        
 
         <canvas ref={canvasRef} hidden />
-
       </main>
+      {capturedImage && !bestPrediction && (
+  <button
+    className="recognise-button"
+    onClick={recogniseImage}
+    disabled={isRecognising}
+  >
+    {isRecognising
+      ? "Recognising..."
+      : "Recognise Image"}
+  </button>
+)}
+      {recognitionError && <p>{recognitionError}</p>}
 
+      {bestPrediction && (
+  <div className="recognition-result-card">
+    <p className="result-label">Recognised Image</p>
+
+    <h2 className="result-name">
+      {displayNames[bestPrediction.class_name] ||
+        bestPrediction.class_name}
+    </h2>
+
+    <div className="match-score-row">
+      <span>Match score</span>
+      <strong>
+        {(bestPrediction.confidence * 100).toFixed(1)}%
+      </strong>
+    </div>
+
+    <div className="match-progress">
+      <div
+        className="match-progress-fill"
+        style={{
+          width: `${bestPrediction.confidence * 100}%`
+        }}
+      />
+    </div>
+
+    <p className="result-note">
+      AI-suggested identification
+    </p>
+  </div>
+)}
       {/* Bottom camera controls */}
       <footer className="camera-controls">
-
         <div className="camera-control-placeholder" />
 
         {/* Capture or retake button */}
@@ -282,22 +381,14 @@ function Camera() {
           <button
             type="button"
             className="shutter-button"
-            onClick={
-              capturedImage ? retakePhoto : capturePhoto
-            }
-            disabled={!capturedImage && !cameraReady}
-            aria-label={
-              capturedImage ? "Retake photo" : "Capture photo"
-            }
+            onClick={capturedImage ? retakePhoto : capturePhoto}
+            disabled={isRecognising || (!capturedImage && !cameraReady)}
+            aria-label={capturedImage ? "Retake photo" : "Capture photo"}
           >
             <span className="shutter-inner" />
           </button>
 
-          {capturedImage && (
-            <span className="retake-label">
-              Retake
-            </span>
-          )}
+          {capturedImage && <span className="retake-label">Retake</span>}
         </div>
 
         {/* Upload image button */}
@@ -320,9 +411,7 @@ function Camera() {
           onChange={handleImageUpload}
           hidden
         />
-
       </footer>
-
     </div>
   );
 }
