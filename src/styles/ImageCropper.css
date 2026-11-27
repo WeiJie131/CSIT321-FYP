@@ -1,0 +1,88 @@
+
+.image-cropper-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.image-cropper-panel {
+  width: 100%;
+  max-width: 500px;
+  max-height: 95dvh;
+  overflow-y: auto;
+  background: white;
+  color: #253b25;
+  border-radius: 16px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.image-cropper-panel h2 {
+  margin: 0 0 10px;
+  text-align: center;
+}
+
+.image-cropper-panel p {
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.image-cropper-area {
+  position: relative;
+  width: 100%;
+  height: min(400px, 45dvh);
+  background: #182518;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.crop-zoom-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.crop-zoom-control input {
+  flex: 1;
+  min-width: 0;
+  accent-color: #315c36;
+}
+
+.crop-action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.crop-action-buttons button {
+  flex: 1;
+  padding: 12px 8px;
+  border: none;
+  border-radius: 8px;
+  background: #eeeeee;
+  color: #333;
+  cursor: pointer;
+}
+
+.crop-action-buttons .confirm-crop-button {
+  background: #315c36;
+  color: white;
+}
+
+@media (max-width: 480px) {
+  .image-cropper-panel {
+    padding: 14px;
+  }
+
+  .crop-action-buttons button {
+    font-size: 13px;
+  }
+}

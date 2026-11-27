@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ImagePlus, Camera as CameraIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ML_API_URL } from "../config/api";
+import ImageCropper from "../components/ImageCropper";
 
 import "../styles/Camera.css";
 
@@ -17,6 +18,7 @@ function Camera() {
   const [cameraError, setCameraError] = useState("");
   const [cameraReady, setCameraReady] = useState(false);
   const [cameraAttempt, setCameraAttempt] = useState(0);
+  const [showCropper, setShowCropper] = useState(false);
 
   const [predictions, setPredictions] = useState([]);
   const [isRecognising, setIsRecognising] = useState(false);
@@ -107,35 +109,39 @@ function Camera() {
 
   // Capture a photograph
   function capturePhoto() {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
+  const video = videoRef.current;
+  const canvas = canvasRef.current;
 
-    if (
-      !video ||
-      !canvas ||
-      !cameraReady ||
-      !video.videoWidth ||
-      !video.videoHeight
-    ) {
-      return;
-    }
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    const context = canvas.getContext("2d");
-
-    if (!context) return;
-
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    const imageData = canvas.toDataURL("image/jpeg", 0.9);
-
-    setCapturedImage(imageData);
-    setCameraReady(false);
-
-    stopCamera();
+  if (
+    !video ||
+    !canvas ||
+    !cameraReady ||
+    !video.videoWidth ||
+    !video.videoHeight
+  ) {
+    return;
   }
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const context = canvas.getContext("2d");
+
+  if (!context) return;
+
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const imageData = canvas.toDataURL("image/jpeg", 0.95);
+
+  setCapturedImage(imageData);
+  setShowCropper(true);
+  setPredictions([]);
+  setRecognitionError("");
+
+  setCameraReady(false);
+
+  stopCamera();
+}
 
   // Retake a photograph
   function retakePhoto() {
@@ -164,25 +170,28 @@ function Camera() {
       alert("Please select a valid image file.");
       return;
     }
+const reader = new FileReader();
 
-    const reader = new FileReader();
+  reader.onload = () => {
+    stopCamera();
+    setCameraReady(false);
+    setCapturedImage(reader.result);
+    setShowCropper(true);
+    setPredictions([]);
+    setRecognitionError("");
 
-    reader.onload = () => {
-      stopCamera();
+    console.log("Gallery image loaded - opening cropper");
+  };
 
-      setCapturedImage(reader.result);
-      setCameraReady(false);
-      setCameraError("");
-      setPredictions([]);
-      setRecognitionError("");
-    };
+  reader.onerror = () => {
+    alert("Unable to read the selected image.");
+  };
 
-    reader.onerror = () => {
-      alert("Unable to read the selected image.");
-    };
+  reader.readAsDataURL(file);
+}
+   
 
-    reader.readAsDataURL(file);
-  }
+    
 
   // Return to the homepage
   function goBack() {
@@ -335,19 +344,46 @@ function Camera() {
 
         <canvas ref={canvasRef} hidden />
       </main>
-      {capturedImage && !bestPrediction && (
-        <button
-          className="recognise-button"
-          onClick={recogniseImage}
-          disabled={isRecognising}
-        >
-          {isRecognising
-            ? "Recognising..."
-            : "Recognise Image"}
-        </button>
-      )}
-      {recognitionError && <p>{recognitionError}</p>}
+   
+{/* Crop & Adjust button */}
+{capturedImage && !showCropper && !isRecognising && (
+  <button
+    type="button"
+    className="crop-adjust-button"
+    onClick={() => setShowCropper(true)}
+  >
+    Crop & Adjust
+  </button>
+)}
 
+{/* Recognise Image button */}
+{capturedImage && !bestPrediction && !showCropper && (
+  <button
+    type="button"
+    className="recognise-button"
+    onClick={recogniseImage}
+    disabled={isRecognising}
+  >
+    {isRecognising
+      ? "Recognising..."
+      : "Recognise Image"}
+  </button>
+)}
+      {recognitionError && <p>{recognitionError}</p>}
+      {showCropper && capturedImage && (
+  <ImageCropper
+    image={capturedImage}
+    onCropComplete={(croppedImage) => {
+      setCapturedImage(croppedImage);
+      setShowCropper(false);
+      setPredictions([]);
+      setRecognitionError("");
+    }}
+    onCancel={() => {
+      setShowCropper(false);
+    }}
+  />
+)}
       {bestPrediction && (
         <div className="recognition-result-card">
           <p className="result-label">Recognised Image</p>

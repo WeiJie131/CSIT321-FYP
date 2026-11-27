@@ -413,3 +413,20 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+.crop-adjust-button {
+  width: 90%;
+  margin: 10px auto;
+  padding: 12px;
+  background-color: transparent;
+  border: 2px solid #315c36;
+  color: #315c36;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: block;
+}
+
+.crop-adjust-button:hover {
+  background-color: #e8f0e5;
+}
